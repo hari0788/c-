@@ -1,0 +1,464 @@
+Design and implement a Java console application for an Airline Reservation & Checkin
+system that handles flights, seats, bookings, payments, and boarding passes. The application should 
+demonstrate object-oriented principles and prevent double booking. 
+Class Requirements: 
+1. Flight 
+2. Aircraft 
+3. Seat 
+4. Passenger 
+5. Booking 
+6. Payment 
+7. BoardingPass 
+Business Rules:
+1. Seats can be booked only if available for the selected flight. 
+2. Payment confirmation is required before issuing a boarding pass. 
+3. Cancellations should release seats immediately as per policy. 
+4. Check-in assigns seats and generates boarding passes. 
+5. Each booking should link directly to a flight, passenger, and seat(s). Console Interface Requirements: 
+1. Menu-driven program: Add Flight / Add Passenger / Create Booking / Make 
+Payment / Check-in & Issue Boarding Pass / Cancel Booking / Display Flights / 
+Exit 
+2. Input validations must be performed for all user entries. 
+3. Encapsulation must be followed for all attributes. 
+Expected Output Behavior: 
+• Show booking receipt with flight, seats, fare, taxes, total amount. 
+• Show boarding pass with passenger, flight, seat, and gate/timestamp. 
+• Show updated seat availability after booking, check-in, or cancellation.
+
+
+S} private static void printMenu() 
+{ 
+System.out.println("=== Airline Reservation & Check-in System ==="); 
+System.out.println("1. Add Flight"); 
+System.out.println("2. Add Passenger"); 
+System.out.println("3. Create Booking"); 
+System.out.println("4. Make Payment"); 
+System.out.println("5. Check-in & Issue Boarding Pass"); 
+System.out.println("6. Cancel Booking"); 
+System.out.println("7. Display Flights"); 
+System.out.println("8. Exit"); 
+System.out.print("Choose an option: "); 
+} 
+// Menu Actions 
+private static void addFlight() { 
+System.out.print("Enter origin: "); 
+String origin = readNonEmpty(); 
+System.out.print("Enter destination: "); 
+String dest = readNonEmpty(); 
+System.out.print("Enter departure date/time (yyyy-MM-dd HH:mm): "); 
+LocalDateTime dt = readDateTime(); 
+System.out.print("Enter gate: "); 
+String gate = readNonEmpty(); 
+System.out.print("Enter aircraft model (e.g., A320): "); 
+String model = readNonEmpty(); 
+System.out.print("Enter number of rows: "); int 
+rows = readIntPositive(); 
+System.out.print("Enter seats per row: "); 
+int seatsPerRow = readIntPositive(); 
+Aircraft aircraft = new Aircraft(model, rows, seatsPerRow);String flightNo = "FL" + (++flightCounter); 
+Flight flight = new Flight(flightNo, origin, dest, dt, gate, aircraft); flights.put(flightNo, 
+flight); 
+System.out.println("Flight added: " + flightNo); 
+} private static void addPassenger() 
+{ 
+System.out.print("First name: "); 
+String fn = readNonEmpty(); 
+System.out.print("Last name: "); 
+String ln = readNonEmpty(); 
+System.out.print("Email: "); 
+String email = readEmail(); 
+String pid = "P" + (++passengerCounter); Passenger p 
+= new Passenger(pid, fn, ln, email); passengers.put(pid, 
+p); 
+System.out.println("Passenger added with ID: " + pid); 
+} private static void createBooking() { 
+System.out.print("Enter passenger ID: "); 
+String pid = scanner.nextLine().trim(); 
+Passenger p = passengers.get(pid); if (p == null) { 
+System.out.println("Passenger not found."); return; } 
+System.out.print("Enter flight number: "); 
+String fid = scanner.nextLine().trim(); Flight f = flights.get(fid); if 
+(f == null) { System.out.println("Flight not found."); return; } 
+System.out.println("Select seats? (y/n) — if no, seats will be assigned at check-in"); 
+String sel = scanner.nextLine().trim().toLowerCase(); 
+List<Seat> chosenSeats = new ArrayList<>(); if 
+(sel.equals("y")) { 
+f.displayAvailableSeats();
+OURCE CODE: 
+import java.time.LocalDateTime; import 
+java.time.format.DateTimeFormatter; import 
+java.util.*; 
+// Airline Reservation & Check-in System 
+// Single-file implementation for console demonstration 
+// Classes: Flight, Aircraft, Seat, Passenger, Booking, Payment, BoardingPass 
+public class AirlineReservationSystem { private static Scanner scanner = new 
+Scanner(System.in); private static Map<String, Flight> flights = new 
+HashMap<>(); private static Map<String, Passenger> passengers = new 
+HashMap<>(); private static Map<String, Booking> bookings = new 
+HashMap<>(); private static int flightCounter = 100; private static int 
+passengerCounter = 1000; private static int bookingCounter = 5000; private static 
+int paymentCounter = 8000; public static void main(String[] args) { 
+seedSampleData(); boolean running = true; while 
+(running) { printMenu(); 
+String choice = scanner.nextLine().trim(); 
+switch (choice) { case "1": addFlight(); 
+break; case "2": addPassenger(); break; 
+case 
+"3": createBooking(); break; case "4": makePayment(); break; case "5": 
+checkInAndIssueBoardingPass(); break; case "6": cancelBooking(); break; 
+case "7": displayFlights(); break; case "8": running = false; 
+System.out.println("Exiting. Goodbye!"); break; default: 
+System.out.println("Invalid choice. Try again."); 
+} 
+System.out.println(); 
+}
+} private static void printMenu() 
+{ 
+System.out.println("=== Airline Reservation & Check-in System ==="); 
+System.out.println("1. Add Flight"); 
+System.out.println("2. Add Passenger"); 
+System.out.println("3. Create Booking"); 
+System.out.println("4. Make Payment"); 
+System.out.println("5. Check-in & Issue Boarding Pass"); 
+System.out.println("6. Cancel Booking"); 
+System.out.println("7. Display Flights"); 
+System.out.println("8. Exit"); 
+System.out.print("Choose an option: "); 
+} 
+// Menu Actions 
+private static void addFlight() { 
+System.out.print("Enter origin: "); 
+String origin = readNonEmpty(); 
+System.out.print("Enter destination: "); 
+String dest = readNonEmpty(); 
+System.out.print("Enter departure date/time (yyyy-MM-dd HH:mm): "); 
+LocalDateTime dt = readDateTime(); 
+System.out.print("Enter gate: "); 
+String gate = readNonEmpty(); 
+System.out.print("Enter aircraft model (e.g., A320): "); 
+String model = readNonEmpty(); 
+System.out.print("Enter number of rows: "); int 
+rows = readIntPositive(); 
+System.out.print("Enter seats per row: "); 
+int seatsPerRow = readIntPositive(); 
+Aircraft aircraft = new Aircraft(model, rows, seatsPerRow);
+String flightNo = "FL" + (++flightCounter); 
+Flight flight = new Flight(flightNo, origin, dest, dt, gate, aircraft); flights.put(flightNo, 
+flight); 
+System.out.println("Flight added: " + flightNo); 
+} private static void addPassenger() 
+{ 
+System.out.print("First name: "); 
+String fn = readNonEmpty(); 
+System.out.print("Last name: "); 
+String ln = readNonEmpty(); 
+System.out.print("Email: "); 
+String email = readEmail(); 
+String pid = "P" + (++passengerCounter); Passenger p 
+= new Passenger(pid, fn, ln, email); passengers.put(pid, 
+p); 
+System.out.println("Passenger added with ID: " + pid); 
+} private static void createBooking() { 
+System.out.print("Enter passenger ID: "); 
+String pid = scanner.nextLine().trim(); 
+Passenger p = passengers.get(pid); if (p == null) { 
+System.out.println("Passenger not found."); return; } 
+System.out.print("Enter flight number: "); 
+String fid = scanner.nextLine().trim(); Flight f = flights.get(fid); if 
+(f == null) { System.out.println("Flight not found."); return; } 
+System.out.println("Select seats? (y/n) — if no, seats will be assigned at check-in"); 
+String sel = scanner.nextLine().trim().toLowerCase(); 
+List<Seat> chosenSeats = new ArrayList<>(); if 
+(sel.equals("y")) { 
+f.displayAvailableSeats();System.out.println("Enter seat numbers separated by commas (e.g., 1A,1B): "); String 
+seatsLine = scanner.nextLine().trim(); String[] parts = seatsLine.split(","); for (String s : 
+parts) { 
+String seatNo = s.trim().toUpperCase(); 
+Seat seat = f.getSeat(seatNo); if (seat == 
+null) { 
+System.out.println("Seat " + seatNo + " does not exist. Booking aborted."); 
+return; } if (!seat.isAvailable()) { 
+System.out.println("Seat " + seatNo + " is already taken. Booking aborted."); return; 
+} chosenSeats.add(seat); 
+} 
+} 
+// Calculate fare: simple flat fare + taxes per seat double baseFare = 150.0; // 
+flat base double taxes = 0.12; // 12% int seatsCount = 
+(chosenSeats.isEmpty()) ? 1 : chosenSeats.size(); double fare = baseFare * 
+seatsCount; double taxAmount = fare * taxes; double total = fare + 
+taxAmount; String bid = "B" + (++bookingCounter); 
+Booking booking = new Booking(bid, f, p, chosenSeats, fare, taxAmount, total); 
+// Reserve seats if chosen for 
+(Seat seat : chosenSeats) { 
+seat.reserve(bid); 
+} bookings.put(bid, 
+booking); 
+System.out.println("Bookin
+g created with ID: " + bid); 
+printBookingReceipt(booki
+ng); 
+System.out.println("Seat 
+availability updated:"); 
+f.displaySeatMap();private static void makePayment() 
+{ 
+System.out.print("Enter booking ID: "); 
+String bid = scanner.nextLine().trim(); Booking booking = bookings.get(bid); if 
+(booking == null) { System.out.println("Booking not found."); return; } if 
+(booking.getPayment() != null && booking.getPayment().isConfirmed()) { 
+System.out.println("Payment already made for this booking."); return; 
+} 
+System.out.println("Amount due: " + String.format("%.2f", booking.getTotalAmount())); 
+System.out.print("Enter payment method (card/cash): "); 
+String method = scanner.nextLine().trim(); 
+System.out.print("Confirm payment? (y/n): "); 
+String conf = scanner.nextLine().trim().toLowerCase(); boolean confirmed 
+= conf.equals("y"); 
+String payId = "PM" + (++paymentCounter); 
+Payment payment = new Payment(payId, booking, booking.getTotalAmount(), method, 
+confirmed); booking.setPayment(payment); if 
+(confirmed) { 
+System.out.println("Payment confirmed. Receipt:"); printPaymentReceipt(payment); 
+} else { 
+System.out.println("Payment not confirmed. Booking remains unpaid."); 
+} 
+} private static void checkInAndIssueBoardingPass() { System.out.print("Enter 
+booking ID: "); 
+String bid = scanner.nextLine().trim(); Booking booking = bookings.get(bid); if 
+(booking == null) { System.out.println("Booking not found."); return; } if 
+(booking.isCancelled()) { System.out.println("Booking is cancelled."); return; } if 
+(booking.getPayment() == null || !booking.getPayment().isConfirmed()) { 
+System.out.println("Payment required before check-in and boarding pass issuance."); return; 
+}Flight flight = booking.getFlight(); 
+// If booking has no seats reserved, assign available seats at check-in if 
+(booking.getSeats().isEmpty()) { int 
+needed = booking.getSeatCount(); 
+List<Seat> assigned = flight.assignAvailableSeats(booking.getBookingId(), needed); if 
+(assigned.size() < needed) { 
+System.out.println("Not enough seats available to assign at check-in."); return; 
+} booking.getSeats().addAll(assigned); 
+} 
+// Mark booking as checked-in and issue boarding pass(s) booking.setCheckedIn(true); 
+List<BoardingPass> passes = new ArrayList<>(); for 
+(Seat seat : booking.getSeats()) { 
+BoardingPass bp = new BoardingPass(booking.getPassenger(), flight, seat, 
+flight.getGate(), LocalDateTime.now()); passes.add(bp); 
+} booking.setBoardingPasses(passes); System.out.println("Check-
+in complete. Boarding Pass(es):"); for (BoardingPass bp : passes) 
+bp.print(); System.out.println("Updated seat availability:"); 
+flight.displaySeatMap(); 
+} 
+private static void cancelBooking() { 
+System.out.print("Enter booking ID: "); 
+String bid = scanner.nextLine().trim(); Booking booking = bookings.get(bid); if 
+(booking == null) { System.out.println("Booking not found."); return; } if 
+(booking.isCancelled()) { System.out.println("Already cancelled."); return; } 
+// Release seats immediately for (Seat seat : 
+booking.getSeats()) { seat.release(); 
+} booking.setCancelled(true); 
+System.out.println("Booking " + bid + " cancelled and seats released.");System.out.println("Updated seat availability for flight " + 
+booking.getFlight().getFlightNumber() + ":"); 
+booking.getFlight().displaySeatMap(); 
+} private static void displayFlights() { if (flights.isEmpty()) { 
+System.out.println("No flights."); return; } for (Flight f : 
+flights.values()) { System.out.println(f.simpleString()); 
+f.displaySeatMap(); 
+System.out.println(); 
+} 
+} 
+// Helpers 
+private static void printBookingReceipt(Booking b) { 
+System.out.println("--- Booking Receipt ---"); 
+System.out.println("Booking ID: " + b.getBookingId()); 
+System.out.println("Passenger: " + b.getPassenger().getFullName() + " (" + 
+b.getPassenger().getPassengerId() + ")"); 
+System.out.println("Flight: " + b.getFlight().getFlightNumber() + " " + b.getFlight().getOrigin() + 
+"->" + b.getFlight().getDestination()); 
+System.out.print("Seats: "); 
+if (b.getSeats().isEmpty()) System.out.println("(to be assigned at check-in)"); else { for 
+(Seat s : b.getSeats()) System.out.print(s.getSeatNumber() + " "); System.out.println(); 
+} 
+System.out.println(String.format("Fare: %.2f", b.getFare())); 
+System.out.println(String.format("Taxes: %.2f", b.getTaxes())); 
+System.out.println(String.format("Total: %.2f", b.getTotalAmount())); 
+System.out.println(" ------------------------ "); 
+} private static void printPaymentReceipt(Payment p) { 
+System.out.println("--- Payment Receipt ---"); 
+System.out.println("Payment ID: " + p.getPaymentId()); 
+System.out.println("Booking ID: " + p.getBooking().getBookingId()); 
+System.out.println(String.format("Amount: %.2f", p.getAmount()));
+System.out.println("Method: " + p.getMethod()); 
+System.out.println("Status: " + (p.isConfirmed() ? "Confirmed" : "Pending")); 
+System.out.println("Timestamp: " + 
+LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))); 
+System.out.println(" ------------------------ "); 
+} private static String readNonEmpty() { while 
+(true) { 
+String s = scanner.nextLine().trim(); if 
+(!s.isEmpty()) return s; 
+System.out.print("Input required. Try again: "); 
+} 
+} private static LocalDateTime readDateTime() { 
+while (true) { 
+String s = scanner.nextLine().trim(); try { 
+DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); return 
+LocalDateTime.parse(s, fmt); 
+} catch (Exception e) { 
+System.out.print("Invalid datetime. Use yyyy-MM-dd HH:mm: "); 
+} 
+} 
+} private static int readIntPositive() 
+{ while (true) { 
+String s = scanner.nextLine().trim(); 
+try { int v = Integer.parseInt(s); if (v > 
+0) return v; 
+} catch (Exception e) {} System.out.print("Enter a 
+positive integer: "); 
+} 
+} private static String readEmail() { while 
+(true) {String e = scanner.nextLine().trim(); if (e.matches("^[A-Za-z0-
+9+_.-]+@[A-Za-z0-9.-]+$")) return e; System.out.print("Invalid 
+email. Try again: "); 
+} 
+} private static void seedSampleData() { 
+Aircraft a1 = new Aircraft("A320", 10, 6); // 10 rows, 6 seats(row A-F) 
+Flight f1 = new Flight("FL101", "Mumbai", "Delhi", LocalDateTime.now().plusDays(1), "G12", 
+a1); 
+flights.put(f1.getFlightNumber(), f1); 
+Aircraft a2 = new Aircraft("B737", 8, 6); 
+Flight f2 = new Flight("FL102", "Delhi", "Bangalore", LocalDateTime.now().plusDays(2), "G5", 
+a2); 
+flights.put(f2.getFlightNumber(), f2); 
+Passenger p = new Passenger("P100", "John", "Doe", "john@example.com"); 
+passengers.put(p.getPassengerId(), p); 
+} 
+} 
+// Domain Classes 
+class Flight { private String flightNumber; private String origin; 
+private String destination; private LocalDateTime departure; 
+private String gate; private Aircraft aircraft; private Map<String, 
+Seat> seats = new LinkedHashMap<>(); 
+public Flight(String flightNumber, String origin, String destination, LocalDateTime departure, String 
+gate, Aircraft aircraft) { 
+this.flightNumber = flightNumber; 
+this.origin = origin; 
+this.destination = destination; 
+this.departure = departure; 
+this.gate = gate; this.aircraft = 
+aircraft; initSeats();} private void initSeats() { for (int r = 1; r <= 
+aircraft.getRows(); r++) { for (int s = 0; s < 
+aircraft.getSeatsPerRow(); s++) { char seatChar = 
+(char)('A' + s); 
+String seatNo = r + String.valueOf(seatChar); seats.put(seatNo, 
+new Seat(seatNo)); 
+} 
+} 
+} 
+public String getFlightNumber() { return flightNumber; } public String 
+getOrigin() { return origin; } public String getDestination() { return 
+destination; } public LocalDateTime getDeparture() { return departure; } 
+public String getGate() { return gate; } public Aircraft getAircraft() { return 
+aircraft; } public Seat getSeat(String seatNumber) { return 
+seats.get(seatNumber); } public void displayAvailableSeats() { 
+System.out.println("Available seats for " + flightNumber + ":"); for (Seat s: seats.values()) if 
+(s.isAvailable()) System.out.print(s.getSeatNumber() + " "); System.out.println(); 
+} public void displaySeatMap() 
+{ 
+System.out.println("Seat map for " + flightNumber + " (X=taken):"); int 
+count = 0; int perRow = aircraft.getSeatsPerRow(); for (Seat s : 
+seats.values()) { 
+System.out.print(s.isAvailable() ? (s.getSeatNumber() + " ") : (s.getSeatNumber()+"(X) ")); 
+count++; if (count % perRow == 0) System.out.println(); 
+} 
+} 
+// Assign available seats at check-in public List<Seat> assignAvailableSeats(String 
+bookingId, int needed) { List<Seat> assigned = new ArrayList<>(); for (Seat s : 
+seats.values()) { if 
+(s.isAvailable()) {
+s.reserve(bookingId); 
+assigned.add(s); if (assigned.size() 
+== needed) break; 
+} } return 
+assigned; } 
+public String 
+simpleString() { 
+DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"); return 
+String.format("%s: %s -> %s | Departs: %s | Gate: %s", flightNumber, origin, 
+destination, departure.format(fmt), gate); 
+} } class Aircraft { private String model; private int rows; private int 
+seatsPerRow; public Aircraft(String model, int rows, int seatsPerRow) { 
+this.model = model; this.rows = rows; this.seatsPerRow = seatsPerRow; 
+} public String getModel() { return model; } public int 
+getRows() { return rows; } public int 
+getSeatsPerRow() { return seatsPerRow; } 
+} class Seat { private String 
+seatNumber; private boolean 
+available = true; 
+private String reservedByBookingId = null; 
+public Seat(String seatNumber) { this.seatNumber = seatNumber; } public 
+String getSeatNumber() { return seatNumber; } public boolean isAvailable() 
+{ return available; } public String getReservedByBookingId() { return 
+reservedByBookingId; } public void reserve(String bookingId) { 
+this.available = false; this.reservedByBookingId = bookingId; 
+} public void release() 
+{ this.available = true; 
+this.reservedByBookin
+gId = null;} 
+} class Passenger { private String passengerId; private String firstName; private String lastName; private 
+String email; public Passenger(String passengerId, String firstName, String lastName, String email) { 
+this.passengerId = passengerId; this.firstName = firstName; this.lastName = lastName; this.email = 
+email; } public String getPassengerId() { return passengerId; } public 
+String getFirstName() { return firstName; } public String 
+getLastName() { return lastName; } public String getEmail() { return 
+email; } public String getFullName() { return firstName + " " + 
+lastName; } 
+} class Booking { private String bookingId; private Flight flight; private Passenger passenger; private 
+List<Seat> seats = new ArrayList<>(); private double fare; private double taxes; private double 
+totalAmount; private Payment payment; private boolean checkedIn = false; private boolean cancelled 
+= false; private List<BoardingPass> boardingPasses = new ArrayList<>(); public Booking(String 
+bookingId, Flight flight, Passenger passenger, List<Seat> seats, double fare, double taxes, double 
+totalAmount) { 
+this.bookingId = bookingId; this.flight = flight; this.passenger = passenger; if (seats != null) 
+this.seats = new ArrayList<>(seats); this.fare = fare; this.taxes = taxes; this.totalAmount = totalAmount; 
+} public String getBookingId() { return bookingId; } public Flight getFlight() { return 
+flight; } public Passenger getPassenger() { return passenger; } public List<Seat> 
+getSeats() { return seats; } public int getSeatCount() { return Math.max(1, seats.size()); 
+} public double getFare() { return fare; } public double getTaxes() { return taxes; } public 
+double getTotalAmount() { return totalAmount; } public Payment getPayment() { return 
+payment; } public void setPayment(Payment payment) { this.payment = payment; } 
+public boolean isCheckedIn() { return checkedIn; } public void setCheckedIn(boolean 
+checkedIn) { this.checkedIn = checkedIn; } public boolean isCancelled() { return 
+cancelled; } public void setCancelled(boolean cancelled) { this.cancelled = cancelled; } 
+public List<BoardingPass> getBoardingPasses() { return boardingPasses; } 
+public void setBoardingPasses(List<BoardingPass> boardingPasses) { this.boardingPasses = 
+boardingPasses; }} class Payment { private 
+String paymentId; private 
+Booking booking; private 
+double amount; private 
+String method; private 
+boolean confirmed; 
+public Payment(String paymentId, Booking booking, double amount, String method, boolean 
+confirmed) { 
+this.paymentId = paymentId; this.booking = booking; this.amount = amount; this.method = 
+method; this.confirmed = confirmed; 
+} public String getPaymentId() { return paymentId; 
+} public Booking getBooking() { return booking; } 
+public double getAmount() { return amount; } 
+public String getMethod() { return method; } public 
+boolean isConfirmed() { return confirmed; } 
+} class BoardingPass { private 
+Passenger passenger; private 
+Flight flight; private Seat seat; 
+private String gate; private 
+LocalDateTime issuedAt; 
+public BoardingPass(Passenger passenger, Flight flight, Seat seat, String gate, LocalDateTime 
+issuedAt) { 
+this.passenger = passenger; this.flight = flight; this.seat = seat; this.gate = gate; this.issuedAt = 
+issuedAt; } public void print() { 
+System.out.println("--- Boarding Pass ---"); System.out.println("Passenger: " 
++ passenger.getFullName() + " (" + passenger.getPassengerId() 
++ ")"); 
+System.out.println("Flight: " + flight.getFlightNumber() + " " + flight.getOrigin() + "->" + 
+flight.getDestination()); 
+System.out.println("Seat: " + seat.getSeatNumber()); 
+System.out.println("Gate: " + gate); 
+System.out.println("Issued: " + issuedAt.format(DateTimeFormatter.ofPattern("yyyy-MM-dd
